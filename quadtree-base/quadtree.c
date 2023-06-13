@@ -26,14 +26,16 @@ QuadNode *newNode(int x, int y, int width, int height)
 
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
-
+    int tamanhoaux = node->width;
     for (size_t i = 0; i < node->height + node->y; i++)
     {
         for (size_t j = 0; j < node->width + node->x; j++)
         {
-            node->color[0] += pic->img->r;
-            node->color[1] += pic->img->g;
-            node->color[2] += pic->img->b;
+            RGBPixel *pixel = &pic->img[i * tamanhoaux + j];
+
+            node->color[0] += pixel->r;
+            node->color[1] += pixel->g;
+            node->color[2] += pixel->b;
         }
     }
 
