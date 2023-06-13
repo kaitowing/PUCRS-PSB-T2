@@ -24,6 +24,24 @@ QuadNode *newNode(int x, int y, int width, int height)
     return n;
 }
 
+Img *calculaTomDeCinza(Img *pic)
+{
+    Img *newPic = malloc(sizeof(Img));
+    for (size_t i = 0; i < pic->height; i++)
+    {
+        for (size_t j = 0; j < pic->width; j++)
+        {
+            RGBPixel *pixel = &pic->img[i * pic->width + j];
+            RGBPixel *newPixel = &newPic->img[i * pic->width + j];
+            newPixel->r = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->g = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->b = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+        }
+    }
+    return newPic;
+}
+
+
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
     int tamanhoaux = node->width;
