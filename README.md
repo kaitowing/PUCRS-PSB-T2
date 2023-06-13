@@ -18,3 +18,8 @@ Caso esteja usando outro ambiente de desenvolvimento, fornecemos um Makefile par
 - Para compilar no Linux ou macOS, basta digitar: ```make```
 - Se estiver utilizando o Windows, o comando é similar: ```mingw32-make -f Makefile.mk```
 
+Alternativamente, você também pode utilizar o CMake (Cross Platform Make) para compilar pelo terminal. Para tanto, crie um diretório "build" embaixo do diretório do projeto e faça:
+```cd build
+cmake ..
+make -j # ou mingw32-make -j no Windows```
+
