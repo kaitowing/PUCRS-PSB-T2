@@ -24,6 +24,28 @@ QuadNode* newNode(int x, int y, int width, int height)
     return n;
 }
 
+int calculaCorMedia(QuadNode *node, Img *pic, RGBPixel *pixels)
+{
+
+    for (size_t i = 0; i < node->height + node->y; i++)
+    {
+        for (size_t j = 0; j < node->width + node->x; j++)
+        {
+            RGBPixel *pixel = &pixels[i * pic->width + j];
+
+            node->color[0] += pixel->r;
+            node->color[1] += pixel->g;
+            node->color[2] += pixel->b;
+        }
+    }
+
+    node->color[0] = node->color[0]/(node->height + 1) * (node->width + 1);
+    node->color[1] = node->color[1]/(node->height + 1) * (node->width + 1);
+    node->color[2] = node->color[2]/(node->height + 1) * (node->width + 1);
+
+    return 0;
+}
+
 QuadNode* geraQuadtree(Img* pic, float minError)
 {
     // Converte o vetor RGBPixel para uma MATRIZ que pode acessada por pixels[linha][coluna]
