@@ -45,22 +45,25 @@ Img *converteParaCinza(Img *pic)
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
     int tamanhoaux = node->width;
-    
+    unsigned char totalR = 0;
+    unsigned char totalG = 0;
+    unsigned char totalB = 0;
+
     for (size_t i = node->y; i < node->height + node->y; i++)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
         {
             RGBPixel *pixel = &pic->img[i * tamanhoaux + j];
 
-            node->color[0] += pixel->r;
-            node->color[1] += pixel->g;
-            node->color[2] += pixel->b;
+            totalR += pixel->r;
+            totalG += pixel->g;
+            totalB += pixel->b;
         }
     }
 
-    node->color[0] = node->color[0] / (node->height + 1) * (node->width + 1);
-    node->color[1] = node->color[1] / (node->height + 1) * (node->width + 1);
-    node->color[2] = node->color[2] / (node->height + 1) * (node->width + 1);
+    node->color[0] = totalR / ((node->height + 1) * (node->width + 1));
+    node->color[1] = totalG / ((node->height + 1) * (node->width + 1));
+    node->color[2] = totalG / ((node->height + 1) * (node->width + 1));
 
     return 0;
 }
@@ -68,12 +71,12 @@ int calculaCorMedia(QuadNode *node, Img *pic)
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
     // Converte o vetor RGBPixel para uma MATRIZ que pode acessada por pixels[linha][coluna]
-    RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
+    // RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
 
-    // Veja como acessar os primeiros 10 pixels da imagem, por exemplo:
-    int i;
-    for (i = 0; i < 10; i++)
-        printf("%02X %02X %02X\n", pixels[0][i].r, pixels[1][i].g, pixels[2][i].b);
+    // // Veja como acessar os primeiros 10 pixels da imagem, por exemplo:
+    // int i;
+    // for (i = 0; i < 10; i++)
+    //     printf("%02X %02X %02X\n", pixels[0][i].r, pixels[1][i].g, pixels[2][i].b);
 
     int width = pic->width;
     int height = pic->height;
