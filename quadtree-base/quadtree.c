@@ -24,7 +24,7 @@ QuadNode *newNode(int x, int y, int width, int height)
     return n;
 }
 
-Img *calculaTomDeCinza(Img *pic)
+Img *converteParaCinza(Img *pic)
 {
     Img *newPic = malloc(sizeof(Img));
     for (size_t i = 0; i < pic->height; i++)
