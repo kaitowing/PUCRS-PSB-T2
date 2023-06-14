@@ -45,9 +45,10 @@ Img *converteParaCinza(Img *pic)
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
     int tamanhoaux = node->width;
-    for (size_t i = 0; i < node->height + node->y; i++)
+    
+    for (size_t i = node->y; i < node->height + node->y; i++)
     {
-        for (size_t j = 0; j < node->width + node->x; j++)
+        for (size_t j = node->x; j < node->width + node->x; j++)
         {
             RGBPixel *pixel = &pic->img[i * tamanhoaux + j];
 
