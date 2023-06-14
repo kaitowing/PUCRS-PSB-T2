@@ -28,6 +28,10 @@ QuadNode *newNode(int x, int y, int width, int height)
 Img *converteParaCinza(Img *pic)
 {
     Img *newPic = malloc(sizeof(Img));
+    newPic->width = pic->width;
+    newPic->height = pic->height;
+    newPic->img = malloc(pic->width * pic->height * sizeof(RGBPixel));
+    
     for (size_t i = 0; i < pic->height; i++)
     {
         for (size_t j = 0; j < pic->width; j++)
@@ -107,81 +111,50 @@ int calculaIntensindadeMedia(int* histograma, int tamanho)
 
 int calculaErroRegiao(int intensidadeMedia, int width, int height, QuadNode *node, Img *pic, float minError)
 {
-    #define NUM_CINZA 256
-    double erro = 0;
-    double value = 0;
     int tamanhoaux = node->width;
+    double erro = 0;
 
-    for (size_t i = node->y; i < node->height -1; i++)
+    for (size_t i = node->y; i < node->height + node->y; i++)
     {
-        for (size_t j = node->x; j < node->width -1; j++)
+        for (size_t j = node->x; j < node->width + node->x; j++)
         {
             RGBPixel *cinza = &pic->img[i * tamanhoaux + j];
-            value += pow((cinza->r - intensidadeMedia), 2);
+            double diferenca = cinza->r - intensidadeMedia;
+            erro += diferenca * diferenca;
         }
     }
 
-    erro = sqrt((1/(width * height)) * value);
+    erro = sqrt((1.0 / (width * height)) * erro);
 
     return erro <= minError;
 }
 
+
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
-    // Converte o vetor RGBPixel para uma MATRIZ que pode acessada por pixels[linha][coluna]
-    // RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
-
-    // // Veja como acessar os primeiros 10 pixels da imagem, por exemplo:
-    // int i;
-    // for (i = 0; i < 10; i++)
-    //     printf("%02X %02X %02X\n", pixels[0][i].r, pixels[1][i].g, pixels[2][i].b);
-
     int width = pic->width;
     int height = pic->height;
 
-    //////////////////////////////////////////////////////////////////////////
-    // Implemente aqui o algoritmo que gera a quadtree, retornando o nodo raiz
-    //////////////////////////////////////////////////////////////////////////
-
-    // COMENTE a linha abaixo quando seu algoritmo ja estiver funcionando
-    // Caso contrario, ele ira gerar uma arvore de teste com 3 nodos
-
-#define DEMO
-#ifdef DEMO
-
-    /************************************************************/
-    /* Teste: criando uma raiz e dois nodos a mais              */
-    /************************************************************/
-
     QuadNode *raiz = newNode(0, 0, width, height);
-    raiz->status = PARCIAL;
-    raiz->color[0] = 0;
-    raiz->color[1] = 0;
-    raiz->color[2] = 255;
 
-    int meiaLargura = width / 2;
-    int meiaAltura = height / 2;
+    Img* newPic = converteParaCinza(pic);
+    // Aloca memória para armazenar o histograma
+    int* histogram = (int*)malloc(256 * sizeof(int));
 
-    QuadNode *nw = newNode(meiaLargura, 0, meiaLargura, meiaAltura);
-    nw->status = PARCIAL;
-    nw->color[0] = 0;
-    nw->color[1] = 0;
-    nw->color[2] = 255;
-
-    // Aponta da raiz para o nodo nw
-    raiz->NW = nw;
-
-    QuadNode *nw2 = newNode(meiaLargura + meiaLargura / 2, 0, meiaLargura / 2, meiaAltura / 2);
-    nw2->status = CHEIO;
-    nw2->color[0] = 255;
-    nw2->color[1] = 0;
-    nw2->color[2] = 0;
-
-    // Aponta do nodo nw para o nodo nw2
-    nw->NW = nw2;
-
-#endif
-    // Finalmente, retorna a raiz da árvore
+    calculaHistograma(raiz,newPic,histogram);
+    int tamanho = raiz->height * raiz->width;
+    int intensidade = calculaIntensindadeMedia(histogram, tamanho);
+    if(calculaErroRegiao(intensidade, raiz->width,raiz->height,raiz,newPic,minError)){
+        calculaCorMedia(raiz,pic);
+    }else{
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+        
+        raiz->NW = geraQuadtree(pic, minError);
+        raiz->NE = geraQuadtree(pic, minError);
+        raiz->SW = geraQuadtree(pic, minError);
+        raiz->SE = geraQuadtree(pic, minError);
+    }
     return raiz;
 }
 
