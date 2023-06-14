@@ -64,6 +64,28 @@ int calculaCorMedia(QuadNode *node, Img *pic)
     return 0;
 }
 
+void calculaHistograma(QuadNode *node, Img *pic, int* histograma)
+{
+    #define NUM_CINZA 256
+    int tamanhoaux = node->width;
+
+    // Inicializa o histograma com zeros
+    for (int i = 0; i < NUM_CINZA; i++) {
+        histograma[i] = 0;
+    }
+    
+
+    // Calcula o histograma
+    for (size_t i = node->y; i < node->height + node->y; i++)
+    {
+        for (size_t j = node->x; j < node->width + node->x; j++)
+        {
+            RGBPixel *cinza = &pic->img[i * tamanhoaux + j];
+            histograma[cinza->r]++;
+        }
+    }
+}
+
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
     // Converte o vetor RGBPixel para uma MATRIZ que pode acessada por pixels[linha][coluna]
