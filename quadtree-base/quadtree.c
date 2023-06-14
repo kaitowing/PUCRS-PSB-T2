@@ -1,6 +1,7 @@
 #include "quadtree.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -96,13 +97,31 @@ int calculaIntensindadeMedia(int* histograma, int tamanho)
     int soma = 0;
     int divisao = 0;
 
-    // Calcula o histograma
     for (size_t i = 0; i < 256; i++)
     {
         soma += histograma[i] * i;
     }
 
     return divisao = soma/tamanho;
+}
+
+int calculaErroRegiao(int intensidadeMedia, int width, int height, QuadNode *node, Img *pic)
+{
+    #define NUM_CINZA 256
+    int erro = 0;
+    int value = 0;
+    int tamanhoaux = node->width;
+
+    for (size_t i = node->y; i < node->height -1; i++)
+    {
+        for (size_t j = node->x; j < node->width -1; j++)
+        {
+            RGBPixel *cinza = &pic->img[i * tamanhoaux + j];
+            value += pow((cinza->r - intensidadeMedia), 2);
+        }
+    }
+
+    return erro = sqrt((1/(width * height)) * value);
 }
 
 QuadNode *geraQuadtree(Img *pic, float minError)
