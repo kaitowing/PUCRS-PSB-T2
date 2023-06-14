@@ -105,11 +105,11 @@ int calculaIntensindadeMedia(int* histograma, int tamanho)
     return divisao = soma/tamanho;
 }
 
-int calculaErroRegiao(int intensidadeMedia, int width, int height, QuadNode *node, Img *pic)
+int calculaErroRegiao(int intensidadeMedia, int width, int height, QuadNode *node, Img *pic, float minError)
 {
     #define NUM_CINZA 256
-    int erro = 0;
-    int value = 0;
+    double erro = 0;
+    double value = 0;
     int tamanhoaux = node->width;
 
     for (size_t i = node->y; i < node->height -1; i++)
@@ -121,7 +121,9 @@ int calculaErroRegiao(int intensidadeMedia, int width, int height, QuadNode *nod
         }
     }
 
-    return erro = sqrt((1/(width * height)) * value);
+    erro = sqrt((1/(width * height)) * value);
+
+    return erro <= minError;
 }
 
 QuadNode *geraQuadtree(Img *pic, float minError)
