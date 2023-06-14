@@ -63,7 +63,7 @@ int calculaCorMedia(QuadNode *node, Img *pic)
 
     node->color[0] = totalR / ((node->height + 1) * (node->width + 1));
     node->color[1] = totalG / ((node->height + 1) * (node->width + 1));
-    node->color[2] = totalG / ((node->height + 1) * (node->width + 1));
+    node->color[2] = totalB / ((node->height + 1) * (node->width + 1));
 
     return 0;
 }
@@ -88,6 +88,21 @@ void calculaHistograma(QuadNode *node, Img *pic, int* histograma)
             histograma[cinza->r]++;
         }
     }
+}
+
+int calculaIntensindadeMedia(int* histograma, int tamanho)
+{
+    #define NUM_CINZA 256
+    int soma = 0;
+    int divisao = 0;
+
+    // Calcula o histograma
+    for (size_t i = 0; i < 256; i++)
+    {
+        soma += histograma[i] * i;
+    }
+
+    return divisao = soma/tamanho;
 }
 
 QuadNode *geraQuadtree(Img *pic, float minError)
