@@ -14,6 +14,7 @@ char desenhaBorda = 1;
 
 QuadNode *newNode(int x, int y, int width, int height)
 {
+    //printf("Criando nodo");
     QuadNode *n = malloc(sizeof(QuadNode));
     n->x = x;
     n->y = y;
@@ -31,21 +32,21 @@ Img *converteParaCinza(Img *pic)
     newPic->width = pic->width;
     newPic->height = pic->height;
     newPic->img = malloc(pic->width * pic->height * sizeof(RGBPixel));
-    
+
+    //printf("convertendo img pra cinza");
     for (size_t i = 0; i < pic->height; i++)
     {
         for (size_t j = 0; j < pic->width; j++)
         {
             RGBPixel *pixel = &pic->img[i * pic->width + j];
             RGBPixel *newPixel = &newPic->img[i * pic->width + j];
-            newPixel->r = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
-            newPixel->g = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
-            newPixel->b = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->r = (unsigned char)0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->g = (unsigned char)0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->b = (unsigned char)0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
         }
     }
     return newPic;
 }
-
 
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
@@ -54,6 +55,7 @@ int calculaCorMedia(QuadNode *node, Img *pic)
     unsigned char totalG = 0;
     unsigned char totalB = 0;
 
+   // printf("Calcula cor mmedia");
     for (size_t i = node->y; i < node->height + node->y; i++)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
@@ -73,18 +75,18 @@ int calculaCorMedia(QuadNode *node, Img *pic)
     return 0;
 }
 
-void calculaHistograma(QuadNode *node, Img *pic, int* histograma)
+void calculaHistograma(QuadNode *node, Img *pic, int *histograma)
 {
-    #define NUM_CINZA 256
+#define NUM_CINZA 256
     int tamanhoaux = node->width;
 
     // Inicializa o histograma com zeros
-    for (int i = 0; i < NUM_CINZA; i++) {
+    for (int i = 0; i < NUM_CINZA; i++)
+    {
         histograma[i] = 0;
     }
-    
 
-    // Calcula o histograma
+    //printf("Calcula o histograma");
     for (size_t i = node->y; i < node->height + node->y; i++)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
@@ -95,18 +97,19 @@ void calculaHistograma(QuadNode *node, Img *pic, int* histograma)
     }
 }
 
-int calculaIntensindadeMedia(int* histograma, int tamanho)
+int calculaIntensindadeMedia(int *histograma, int tamanho)
 {
-    #define NUM_CINZA 256
+#define NUM_CINZA 256
     int soma = 0;
     int divisao = 0;
 
+    //printf("CalcIntensidade");
     for (size_t i = 0; i < 256; i++)
     {
         soma += histograma[i] * i;
     }
 
-    return divisao = soma/tamanho;
+    return divisao = soma / tamanho;
 }
 
 int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minError)
@@ -114,6 +117,7 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
     int tamanhoaux = node->width;
     double erro = 0;
 
+    //printf("Calc Erro");
     for (size_t i = node->y; i < node->height + node->y; i++)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
@@ -125,10 +129,49 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
     }
 
     erro = sqrt((1.0 / (node->width * node->height)) * erro);
-
     return erro <= minError;
 }
 
+QuadNode *geraNovaTree(Img *pic, QuadNode *raiz,  float minError){
+    
+
+    // Aloca memória para armazenar o histograma
+    int *histogram = (int *)malloc(256 * sizeof(int));
+
+    calculaHistograma(raiz, pic, histogram);
+    int tamanho = raiz->height * raiz->width;
+    int intensidade = calculaIntensindadeMedia(histogram, tamanho);
+    if (calculaErroRegiao(intensidade, raiz, pic, minError))
+    {
+        printf("Caiu no if");
+        calculaCorMedia(raiz, pic);
+    }
+    else
+    {
+        //printf("Caiu no else");
+        int halfWidth = raiz->width  / 2;
+        int halfHeight = raiz->height / 2;
+        if (halfHeight == 1 || halfWidth == 1)
+        {
+
+            raiz->NW->status = CHEIO;
+            raiz->NE->status = CHEIO;
+            raiz->SW->status = CHEIO;
+            raiz->SE->status = CHEIO;
+            return raiz;
+        }
+        else
+        {
+            raiz->width /= 2;
+            raiz->height /= 2;
+            raiz->NW = geraNovaTree(pic, raiz, minError);
+            raiz->NE = geraNovaTree(pic, raiz, minError);
+            raiz->SW = geraNovaTree(pic, raiz, minError);
+            raiz->SE = geraNovaTree(pic, raiz, minError);
+        }
+    }
+    return raiz;
+}
 
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
@@ -137,24 +180,10 @@ QuadNode *geraQuadtree(Img *pic, float minError)
 
     QuadNode *raiz = newNode(0, 0, width, height);
 
-    Img* newPic = converteParaCinza(pic);
-    // Aloca memória para armazenar o histograma
-    int* histogram = (int*)malloc(256 * sizeof(int));
+    Img *newPic = converteParaCinza(pic);
 
-    calculaHistograma(raiz,newPic,histogram);
-    int tamanho = raiz->height * raiz->width;
-    int intensidade = calculaIntensindadeMedia(histogram, tamanho);
-    if(calculaErroRegiao(intensidade,raiz,newPic,minError)){
-        calculaCorMedia(raiz,pic);
-    }else{
-        int halfWidth = width / 2;
-        int halfHeight = height / 2;
-        
-        raiz->NW = geraQuadtree(pic, minError);
-        raiz->NE = geraQuadtree(pic, minError);
-        raiz->SW = geraQuadtree(pic, minError);
-        raiz->SE = geraQuadtree(pic, minError);
-    }
+    geraNovaTree(newPic, raiz, minError);
+
     return raiz;
 }
 
