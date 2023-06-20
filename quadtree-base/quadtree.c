@@ -38,9 +38,10 @@ Img *converteParaCinza(Img *pic)
         {
             RGBPixel *pixel = &pic->img[i * pic->width + j];
             RGBPixel *newPixel = &newPic->img[i * pic->width + j];
-            newPixel->r = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
-            newPixel->g = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
-            newPixel->b = (unsigned char) 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->r = 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->g = 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            newPixel->b = 0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b;
+            //printf("%c", newPixel->r);
         }
     }
     return newPic;
@@ -113,50 +114,64 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
 {
     int tamanhoaux = node->width;
     double erro = 0;
+    double soma = 0;
+    double diferenca = 0;
 
+    //printf("Calc Erro");
     for (size_t i = node->y; i < node->height + node->y; i++)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
         {
             RGBPixel *cinza = &pic->img[i * tamanhoaux + j];
-            double diferenca = cinza->r - intensidadeMedia;
-            erro += diferenca * diferenca;
+            diferenca = pow(cinza->r - intensidadeMedia, 2);
+            soma += diferenca;
         }
     }
 
-    erro = sqrt((1.0 / (node->width * node->height)) * erro);
-
+    erro = sqrt((1.0 / (node->width * node->height)) * soma);
     return erro <= minError;
+}
+
+QuadNode *gerarQuadtree(Img *pic, float minError, int x, int y, int width, int height)
+{
+    // Aloca memória para armazenar o histograma
+    QuadNode *raiz = newNode(x,y,width,height);
+    int* histogram = (int*)malloc(256 * sizeof(int));
+
+    calculaHistograma(raiz, pic, histogram);
+    int tamanho = raiz->height * raiz->width;
+    int intensidade = calculaIntensindadeMedia(histogram, tamanho);
+    if (calculaErroRegiao(intensidade, raiz, pic, minError)) {
+        //printf("Entrou no if");
+        calculaCorMedia(raiz, pic);
+        return raiz;
+    }
+    else {
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+
+        if (halfWidth <= 1 || halfHeight <= 1) {
+            raiz->status = CHEIO;
+            return raiz;
+        }
+
+        // Gera os quadtrees para as quatro partes menores
+        raiz->status = PARCIAL;
+        raiz->NW = gerarQuadtree(pic, minError, x, y, halfWidth, halfHeight);
+        raiz->NE = gerarQuadtree(pic, minError, x + halfWidth, y, halfWidth, halfHeight);
+        raiz->SW = gerarQuadtree(pic, minError, x, y + halfHeight, halfWidth, halfHeight);
+        raiz->SE = gerarQuadtree(pic, minError, x + halfWidth, y + halfHeight, halfWidth, halfHeight);
+    }
+    return raiz;
 }
 
 
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
-    int width = pic->width;
-    int height = pic->height;
-
-    QuadNode *raiz = newNode(0, 0, width, height);
-
     Img* newPic = converteParaCinza(pic);
-    // Aloca memória para armazenar o histograma
-    int* histogram = (int*)malloc(256 * sizeof(int));
-
-    calculaHistograma(raiz,newPic,histogram);
-    int tamanho = raiz->height * raiz->width;
-    int intensidade = calculaIntensindadeMedia(histogram, tamanho);
-    if(calculaErroRegiao(intensidade,raiz,newPic,minError)){
-        calculaCorMedia(raiz,pic);
-    }else{
-        int halfWidth = width / 2;
-        int halfHeight = height / 2;
-        
-        raiz->NW = geraQuadtree(pic, minError);
-        raiz->NE = geraQuadtree(pic, minError);
-        raiz->SW = geraQuadtree(pic, minError);
-        raiz->SE = geraQuadtree(pic, minError);
-    }
-    return raiz;
+    return gerarQuadtree(newPic, minError, 0, 0, pic->width, pic->height);
 }
+
 
 // Limpa a memória ocupada pela árvore
 void clearTree(QuadNode *n)
