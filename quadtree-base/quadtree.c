@@ -42,8 +42,6 @@ Img *converteParaCinza(Img *pic)
             RGBPixel *pixel = &pixels[i][j];
             RGBPixel *newPixel = &newPixels[i][j];
             newPixel->r = (unsigned char)(0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b);
-            newPixel->g = newPixel->r;
-            newPixel->b = newPixel->r;
         }
     }
     return newPic;
@@ -94,7 +92,7 @@ void calculaHistograma(QuadNode *node, Img *pic, int *histograma)
         for (size_t j = node->x; j < node->x + node->width; j++)
         {
             RGBPixel *pixel = &pixels[i][j];
-            int tomDeCinza = (pixel->r + pixel->g + pixel->b) / 3;
+            int tomDeCinza = pixel->r;
             histograma[tomDeCinza]++;
         }
     }
@@ -112,7 +110,12 @@ int calculaIntensidadeMedia(int *histograma, int tamanho)
     return soma / tamanho;
 }
 
-int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minError)
+int achaIntensidade(int *histograma, int i){
+
+    return histograma[i] * i;
+}
+
+int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minError, int *histo)
 {
     double erro = 0.0;
     double soma = 0.0;
@@ -123,13 +126,13 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
         for (size_t j = node->x; j < node->x + node->width; j++)
         {
             RGBPixel *pixel = &pixels[i][j];
-            int intensidadePixel = (pixel->r + pixel->g + pixel->b) / 3;
-            diferenca = pow(intensidadePixel - intensidadeMedia, 2);
+            int intenspix = pixel->r;
+            diferenca = pow(intenspix - intensidadeMedia, 2);
             soma += diferenca;
         }
     }
 
-    erro = sqrt((1.0 / (node->width * node->height)) * soma);
+    erro = sqrt(soma/(node->width * node->height));
 
     return erro <= minError;
 }
@@ -149,7 +152,7 @@ QuadNode *gerarQuadtree(Img *picCinza, float minError, int x, int y, int width, 
     int halfWidth = width / 2;
     int halfHeight = height / 2;
 
-    if (halfWidth <= 1 || halfHeight <= 1 || calculaErroRegiao(intensidade, raiz, picCinza, minError))
+    if (halfWidth <= 1 || halfHeight <= 1 || calculaErroRegiao(intensidade, raiz, picCinza, minError, histogram))
     {
         // raiz->NW->status = CHEIO;
         // raiz->NE->status = CHEIO;
