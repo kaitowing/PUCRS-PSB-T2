@@ -27,7 +27,6 @@ QuadNode *newNode(int x, int y, int width, int height)
 
 Img *converteParaCinza(Img *pic)
 {
-
     Img *newPic = malloc(sizeof(Img));
     newPic->width = pic->width;
     newPic->height = pic->height;
@@ -148,7 +147,7 @@ QuadNode *gerarQuadtree(Img *picCinza, float minError, int x, int y, int width, 
     int halfWidth = width / 2;
     int halfHeight = height / 2;
 
-    if (calculaErroRegiao(intensidade, raiz, picCinza) <= minError)
+    if (halfHeight<=1 || halfWidth <= 0 || calculaErroRegiao(intensidade, raiz, picCinza) <= minError)
     {
         raiz->status = CHEIO;
         return raiz;
