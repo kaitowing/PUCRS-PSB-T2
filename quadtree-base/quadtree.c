@@ -33,13 +33,14 @@ Img *converteParaCinza(Img *pic)
     newPic->height = pic->height;
     newPic->img = malloc(pic->width * pic->height * sizeof(RGBPixel));
     RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
+    RGBPixel(*newPixels)[newPic->width] = (RGBPixel(*)[newPic->height])newPic->img;
 
     for (size_t i = 0; i < pic->height; i++)
     {
         for (size_t j = 0; j < pic->width; j++)
         {
-            RGBPixel *pixel = pixels[i][j];
-            RGBPixel *newPixel = &newPic->img[i * pic->width + j];
+            RGBPixel *pixel = &pixels[i][j];
+            RGBPixel *newPixel = &newPixels[i][j];
             newPixel->r = (unsigned char)(0.3 * pixel->r + 0.59 * pixel->g + 0.11 * pixel->b);
             newPixel->g = newPixel->r;
             newPixel->b = newPixel->r;
@@ -51,7 +52,7 @@ Img *converteParaCinza(Img *pic)
 
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
-    int tamanhoaux = node->width;
+    RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
     unsigned int totalR =0;
     unsigned int totalG =0;
     unsigned int totalB = 0;
@@ -60,7 +61,7 @@ int calculaCorMedia(QuadNode *node, Img *pic)
     {
         for (size_t j = node->x; j < node->width + node->x; j++)
         {
-            RGBPixel *pixel = &pic->img[i * tamanhoaux + j];
+            RGBPixel *pixel = &pixels[i][j];
             //printf("%d\n",pixel->r);
             totalR += pixel->r;
             totalG += pixel->g;
@@ -80,7 +81,7 @@ int calculaCorMedia(QuadNode *node, Img *pic)
 void calculaHistograma(QuadNode *node, Img *pic, int *histograma)
 {
     const int NUM_CINZA = 256;
-
+    RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
     // Inicializa o histograma com zeros
     for (int i = 0; i < NUM_CINZA; i++)
     {
@@ -92,7 +93,7 @@ void calculaHistograma(QuadNode *node, Img *pic, int *histograma)
     {
         for (size_t j = node->x; j < node->x + node->width; j++)
         {
-            RGBPixel *pixel = &pic->img[i * pic->width + j];
+            RGBPixel *pixel = &pixels[i][j];
             int tomDeCinza = (pixel->r + pixel->g + pixel->b) / 3;
             histograma[tomDeCinza]++;
         }
@@ -116,12 +117,12 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
     double erro = 0.0;
     double soma = 0.0;
     double diferenca = 0.0;
-
+    RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
     for (size_t i = node->y; i < node->y + node->height; i++)
     {
         for (size_t j = node->x; j < node->x + node->width; j++)
         {
-            RGBPixel *pixel = &pic->img[i * pic->width + j];
+            RGBPixel *pixel = &pixels[i][j];
             int intensidadePixel = (pixel->r + pixel->g + pixel->b) / 3;
             diferenca = pow(intensidadePixel - intensidadeMedia, 2);
             soma += diferenca;
