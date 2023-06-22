@@ -120,19 +120,20 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
     double erro = 0.0;
     double soma = 0.0;
     double diferenca = 0.0;
+    int tamanho = node->width * node->height;
     RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
     for (size_t i = node->y; i < node->y + node->height; i++)
     {
         for (size_t j = node->x; j < node->x + node->width; j++)
         {
             RGBPixel *pixel = &pixels[i][j];
-            int intenspix = pixel->r;
-            diferenca = pow(intenspix - intensidadeMedia, 2);
+            int intensidadePixel = pixel->r;
+            diferenca = pow(intensidadePixel - intensidadeMedia, 2);
             soma += diferenca;
         }
     }
 
-    erro = sqrt(soma/(node->width * node->height));
+    erro = sqrt(soma / tamanho);
 
     return erro <= minError;
 }
