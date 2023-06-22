@@ -31,6 +31,7 @@ GLuint tex;
 
 QuadNode* raiz;
 Img pic;
+Img picCinza;
 
 int erro=20;     // nível de erro mínimo inicial
 
@@ -42,7 +43,8 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
     int chan;
-    pic.img = (RGBPixel *) SOIL_load_image(argv[1], &pic.width, &pic.height, &chan, SOIL_LOAD_AUTO); //, SOIL_FLAG_INVERT_Y); // | SOIL_FLAG_POWER_OF_TWO);
+    pic.img = (RGBPixel *) SOIL_load_image(argv[1], &pic.width, &pic.height, &chan, SOIL_LOAD_AUTO); 
+    picCinza.img = (RGBPixel *) SOIL_load_image(argv[1], &pic.width, &pic.height, &chan, SOIL_LOAD_AUTO); //, SOIL_FLAG_INVERT_Y); // | SOIL_FLAG_POWER_OF_TWO);
     if(!pic.img)
     {
         printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
@@ -117,7 +119,7 @@ void keyboard(unsigned char key, int x, int y)
 
         printf("Erro: %d\n", erro);
 
-        raiz = geraQuadtree(&pic, erro);
+        raiz = geraQuadtree(&pic,&picCinza, erro);
     }
     glutPostRedisplay();
 }

@@ -7,8 +7,8 @@ enum { CHEIO, PARCIAL };
 
 struct Quad {
     unsigned int id;
-    float x, y;              // canto superior esquerdo da região
-    float width, height;     // largura e altura da região
+    int x, y;              // canto superior esquerdo da região
+    int width, height;     // largura e altura da região
     int status;              // CHEIO ou PARCIAL
     unsigned char color[3];  // cor média da região
     struct Quad* NW;            // ponteiros para os filhos, se houver
@@ -30,7 +30,7 @@ typedef struct {
 
 typedef struct Quad QuadNode;
 
-QuadNode* geraQuadtree(Img* img, float minDetail);
+QuadNode* geraQuadtree(Img* img, Img* picCinza,float minDetail);
 QuadNode* newNode(int x, int y, int width, int height);
 
 void clearTree(QuadNode* n);
