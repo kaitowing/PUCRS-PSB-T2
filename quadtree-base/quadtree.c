@@ -131,13 +131,13 @@ int calculaErroRegiao(int intensidadeMedia, QuadNode *node, Img *pic, float minE
     return erro <= minError;
 }
 
-QuadNode *gerarQuadtree(Img *pic, float minError, int x, int y, int width, int height)
+QuadNode *gerarQuadtree(Img *picCinza, float minError, int x, int y, int width, int height, Img *pic)
 {
     // Aloca memória para armazenar o histograma
     QuadNode *raiz = newNode(x, y, width, height);
     int *histogram = (int *)malloc(256 * sizeof(int));
 
-    calculaHistograma(raiz, pic, histogram);
+    calculaHistograma(raiz, picCinza, histogram);
     int tamanho = raiz->height * raiz->width;
     int intensidade = calculaIntensindadeMedia(histogram, tamanho);
     calculaCorMedia(raiz, pic);
@@ -145,7 +145,7 @@ QuadNode *gerarQuadtree(Img *pic, float minError, int x, int y, int width, int h
     int halfWidth = width / 2;
     int halfHeight = height / 2;
 
-    if (halfWidth <= 1 || halfHeight <= 1 || calculaErroRegiao(intensidade, raiz, pic, minError))
+    if (halfWidth <= 1 || halfHeight <= 1 || calculaErroRegiao(intensidade, raiz, picCinza, minError))
     {
         raiz->status = CHEIO;
         return raiz;
@@ -153,17 +153,17 @@ QuadNode *gerarQuadtree(Img *pic, float minError, int x, int y, int width, int h
 
     // Gera os quadtrees para as quatro partes menores
     raiz->status = PARCIAL;
-    raiz->NW = gerarQuadtree(pic, minError, x, y, halfWidth, halfHeight);
-    raiz->NE = gerarQuadtree(pic, minError, x + halfWidth, y, halfWidth, halfHeight);
-    raiz->SW = gerarQuadtree(pic, minError, x, y + halfHeight, halfWidth, halfHeight);
-    raiz->SE = gerarQuadtree(pic, minError, x + halfWidth, y + halfHeight, halfWidth, halfHeight);
+    raiz->NW = gerarQuadtree(picCinza, minError, x, y, halfWidth, halfHeight, pic);
+    raiz->NE = gerarQuadtree(picCinza, minError, x + halfWidth, y, halfWidth, halfHeight, pic);
+    raiz->SW = gerarQuadtree(picCinza, minError, x, y + halfHeight, halfWidth, halfHeight, pic);
+    raiz->SE = gerarQuadtree(picCinza, minError, x + halfWidth, y + halfHeight, halfWidth, halfHeight, pic);
     return raiz;
 }
 
 QuadNode *geraQuadtree(Img *pic, float minError)
 {
     Img *newPic = converteParaCinza(pic);
-    return gerarQuadtree(newPic, minError, 0, 0, pic->width, pic->height);
+    return gerarQuadtree(newPic, minError, 0, 0, pic->width, pic->height, pic);
 }
 
 // Limpa a memória ocupada pela árvore
