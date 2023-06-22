@@ -50,12 +50,11 @@ Img *converteParaCinza(Img *pic)
     return newPic;
 }
 
-
 int calculaCorMedia(QuadNode *node, Img *pic)
 {
     RGBPixel(*pixels)[pic->width] = (RGBPixel(*)[pic->height])pic->img;
-    unsigned int totalR =0;
-    unsigned int totalG =0;
+    unsigned int totalR = 0;
+    unsigned int totalG = 0;
     unsigned int totalB = 0;
 
     for (size_t i = node->y; i < node->height + node->y; i++)
@@ -104,11 +103,12 @@ unsigned char calculaIntensidadeMedia(long long *histograma, int tamanho)
     {
         soma += histograma[i] * i;
     }
-     soma /= tamanho;
-    return (unsigned char) soma;
+    soma /= tamanho;
+    return (unsigned char)soma;
 }
 
-int achaIntensidade(int *histograma, int i){
+int achaIntensidade(int *histograma, int i)
+{
 
     return histograma[i] * i;
 }
@@ -134,7 +134,6 @@ double calculaErroRegiao(unsigned char intensidadeMedia, QuadNode *node, Img *pi
     erro = sqrt(soma / tamanho);
     return erro;
 }
-
 
 QuadNode *gerarQuadtree(Img *picCinza, float minError, int x, int y, int width, int height, Img *pic)
 {
