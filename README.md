@@ -8,6 +8,8 @@ Há diversas técnicas que podem ser usadas para a compressão de imagens. As ma
 
 O objetivo deste trabalho é explorar os conceitos de programação em C, bem como o uso de ponteiros em uma estrutura de árvore, criando um programa capaz de ler uma imagem qualquer e gerar uma quadtree correspondente. Para visualizar o resultado, é fornecido um código que desenha a árvore.
 
+### 2. Compilação
+
 ### 2.1 Visual Studio Code
 Se você estiver utilizando o Visual Studio Code, basta descompactar o zip e abrir a pasta.
 - Para compilar: use Ctrl+Shift+B (⌘+Shift+B no macOS).
@@ -17,5 +19,8 @@ Se você estiver utilizando o Visual Studio Code, basta descompactar o zip e abr
 Caso esteja usando outro ambiente de desenvolvimento, fornecemos um Makefile para Linux e macOS, e outro para Windows (Makefile.mk).
 - Para compilar no Linux ou macOS, basta digitar: ```make```
 - Se estiver utilizando o Windows, o comando é similar: ```mingw32-make -f Makefile.mk```
+
+### 3. Execução
+Para executar o programa, após a compilação, execute em seu terminal o comando ```./quadtree "nomeDaImagem.tipo"```
 
 
