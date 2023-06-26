@@ -5,10 +5,11 @@ Maio de 2023
 
 ### Imagens geradas pelo programa:
 - Antes da compressão:
-- ![Screenshot from 2023-06-26 09-41-41](https://github.com/kaitowing/PUCRS-PSB-T2/assets/105385276/3882b09f-25eb-49eb-a0a4-534efb94ce1e)
+![stretched-1920-1080-764519](https://github.com/kaitowing/PUCRS-PSB-T2/assets/105385276/d2853beb-9f91-4ce6-ac8b-821428cc9597)
+
 
 - Pós compressão:
-- ![Screenshot from 2023-06-26 09-43-06](https://github.com/kaitowing/PUCRS-PSB-T2/assets/105385276/6431edf5-427c-4f15-bb19-2c294fc6ffe0)
+![Screenshot from 2023-06-26 09-43-06](https://github.com/kaitowing/PUCRS-PSB-T2/assets/105385276/6431edf5-427c-4f15-bb19-2c294fc6ffe0)
 
 
 ### 1. Introdução
